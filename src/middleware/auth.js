@@ -10,8 +10,8 @@ const authentication = async function (req, res, next) {
         if (!token) { return res.status(400).send({ status: false, message: "Token must be present" }) }
 
         JWT.verify(token, "from-group-13", function (error, decodedToken) {
-            if(error && error.message=="jwt expired") 
-            return res.status(401).send({status:false, message:"Session Expired! Login again"})
+            if (error && error.message == "jwt expired")
+                return res.status(401).send({ status: false, message: "Session Expired! Login again" })
             if (error) {
                 return res.status(401).send({ status: false, message: "enter a valid token" })
             }
@@ -19,14 +19,13 @@ const authentication = async function (req, res, next) {
                 req.token = decodedToken
                 next()
             }
-
         })
-
     }
     catch (error) {
-        res.status(500).send({ status: "error", message: error.message })
+        return res.status(500).send({ status: false, message: error.message })
     }
 }
+
 const authorisation = async function (req, res, next) {
     try {
         let bookId = req.params.bookId
@@ -34,14 +33,14 @@ const authorisation = async function (req, res, next) {
 
             if (!isValidObjectIds(bookId)) return res.status(400).send({ status: false, message: "Invalid Book Id" })
             const matchBookId = await bookModel.findById({ _id: bookId })
-            
+
             if (!matchBookId || matchBookId.isDeleted == true) return res.status(404).send({ status: false, message: "Book Not found" })
             if (matchBookId['userId'].toString() !== req.token.payload.userId) {
                 return res.status(403).send({ status: false, message: "Unauthorised user!" })
             }
             return next()
-
         }
+        
         let data = req.body
         let { userId } = data
         if (!userId) return res.status(400).send({ status: false, message: "User Id is mandatory" })

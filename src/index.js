@@ -1,9 +1,12 @@
 const express = require("express")
 const route = require("./routes/route")
 const app = express()
+const multer=require('multer')
 
 const mongoose = require("mongoose")
 app.use(express.json())
+
+app.use(multer().any())
 
 
 app.use(express.urlencoded({ extended: true }))

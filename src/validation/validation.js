@@ -2,7 +2,6 @@ const {isValidObjectId} = require("mongoose")
 
 const validName=function(name){
     const nameRegex=/^[ a-z ]+$/i
-
     return nameRegex.test(name)
 }
 

@@ -4,6 +4,10 @@ const userController=require('../controller/userController')
 const bookController=require('../controller/bookController')
 const reviewController=require('../controller/reviewController')
 const middleware =require("../middleware/auth")
+const awsFile=require('../aws/aws')
+
+
+router.post('/write-file-aws', awsFile.awsUrl)
 
 router.post('/register', userController.createUser)
 
@@ -20,8 +24,8 @@ router.put("/books/:bookId",middleware.authentication,middleware.authorisation,b
 router.delete("/books/:bookId",middleware.authentication,middleware.authorisation,bookController.deleteBookById)
 
 router.post("/books/:bookId/review", reviewController.createReview)
-router.put('/books/:bookId/review/:reviewId',reviewController.updateReview)
 
+router.put('/books/:bookId/review/:reviewId',reviewController.updateReview)
 
 router.delete("/books/:bookId/review/:reviewId", reviewController.deleteReviewByParam)
 

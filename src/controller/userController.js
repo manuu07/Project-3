@@ -11,7 +11,7 @@ const createUser=async function(req,res){
     try{ 
     const data=req.body
     const {title,name,phone,email,password,address}=data
-    if(Object.keys(data)==0) return res.status(400).send({status:false, message:"No data given for creation"})
+    if(Object.keys(data).length==0) return res.status(400).send({status:false, message:"No data given for creation"})
 
     if(!title) return res.status(400).send({status:false, message:"Title is mandatory"})
     if(!isValid(title)) return res.status(400).send({status:false, message:"Title can't be empty"})
@@ -39,16 +39,18 @@ const createUser=async function(req,res){
 
     if(address){
         if(typeof address!=="object") return res.status(400).send({status:false, message:"Address is in wrong format"})
-        if(Object.keys(address)==0) return res.status(400).send({status:false, message:"No Address given"})
+        if(Object.keys(address).length==0) return res.status(400).send({status:false, message:"No Address given"})
 
-        if(address.street || address.street=="")
+        if(address.street || address.street==""){ 
         if( !isValid(address.street)) return res.status(400).send({status:false,message:"Street is in wrong format"})
-        if(address.city || address.city=="")
-        if( !isValid(address.city)) return res.status(400).send({status:false, message:"City is in wrong format"})
-        if(address.pincode || address.pincode=="")
+        }
+        if(address.city || address.city==""){ 
+        if( !isValid(address.city)) return res.status(400).send({status:false, message:"City is in wrong format"})}
+        if(address.pincode || address.pincode==""){ 
         if( !isValid(address.pincode)) return res.status(400).send({status:false, message: "Pincode is in wrong format"})
         if(address.pincode && !isValidPincode(address.pincode)) return res.status(400).send({status:false, message: "Invalid Pincode"})
     }
+}
 
     const userCreated=await userModel.create(data)
     return res.status(201).send({status:true, message:"Success", data:userCreated})
@@ -66,19 +68,17 @@ const loginUser = async function (req, res) {
         let email =req.body.email;
         let password =req.body.password
     
-        if (Object.keys(req.body).length == 0) { return res.status(400).send({ status: false, message: "body is empty" }) }
+        if (Object.keys(req.body).length == 0)  return res.status(400).send({ status: false, message: "body is empty" }) 
 
         if (!email) { return res.status(400).send({ status: false, message: "Email is required" }) }
         if (!password) { return res.status(400).send({ status: false, message: "Password is required" }) }
 
         let userData = await userModel.findOne({ email: email, password: password })
-        if (!userData) { return res.status(400).send({ status: false, message: "invalid credentials! pls check it " }) }
+        if (!userData)  return res.status(400).send({ status: false, message: "Invalid credentials! pls check it " }) 
 
         let payload =
         {
             userId: userData['_id'].toString()  
-            
-
         }
         let token = JWT.sign({ payload }, "from-group-13",{expiresIn :'24h'})  //expires in 24 hrs
         res.setHeader("x-api-key", token)
@@ -86,16 +86,11 @@ const loginUser = async function (req, res) {
         let iat=decodedToken.iat
         let exp=decodedToken.exp
 
-        
-
         let obj = {token: token, userId: userData['_id'],  iat:iat , exp:exp}
-        res.status(200).send({ status: true, message: "token generated successfully", data: obj })
+        return res.status(200).send({ status: true, message: "token generated successfully", data: obj })
     }
-        
-catch (error) {
-            res.status(500).send({ status: 'error', message: error.message })
+    catch (error) {
+        return res.status(500).send({ status: false, message: error.message })
         }
-
-    
 }
 module.exports ={loginUser,createUser}

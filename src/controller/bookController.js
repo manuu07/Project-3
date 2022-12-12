@@ -18,8 +18,6 @@ const createBook = async function (req, res) {
         if (!excerpt) return res.status(400).send({ status: false, message: "Excerpt is mandatory" })
         if (!isValid(excerpt)) return res.status(400).send({ status: false, message: "Excerpt can't be empty" })
 
-        if (!isValid(userId)) return res.status(400).send({ status: false, message: "User Id can't be empty" })
-        if (!isValidObjectIds(userId)) return res.status(400).send({ status: false, message: "Invalid UserId" })
         if (!ISBN) return res.status(400).send({ status: false, message: "ISBN is mandatory" })
         if (!isValid(ISBN)) return res.status(400).send({ status: false, message: "ISBN can't be empty" })
         if (!isValidISBN(ISBN)) return res.status(400).send({ status: false, message: "Invalid ISBN" })
@@ -68,6 +66,7 @@ const getBookData = async function (req, res) {
                 return res.status(400).send({ status: false, message: "Enter Valid User Id" })
             }
         }
+        
         const book = await bookModel.find({ $or: [{ userId: userId }, { category: category }, { subcategory: subcategory }], isDeleted: false }).select({ title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 ,subcategory:1})
         
         if (book.length == 0) {
@@ -101,16 +100,16 @@ const getBookbyId = async function (req, res) {
         let reviewsData = await reviewModel.find({ bookId: bookId, isDeleted: false }).select({
             _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1
         })
-
+        
         const books = Book.toObject()
         books['reviewsData'] = [...reviewsData]
         return res.status(200).send({ status: true, message: 'Books list', data: books })
     }
     catch (err) {
-        console.log(err)
         res.status(500).send({ status: false, message: err.message })
     }
 }
+
 //---------------------------Update bookData----------------------------------//
 const updateBookById = async function (req, res) {
     try {

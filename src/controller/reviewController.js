@@ -96,7 +96,7 @@ const updateReview = async function (req, res) {
 }
 
 
-//------------------------------------------------Delete Review--------------------------//
+//------------------------------------Delete Review--------------------------//
 const deleteReviewByParam = async function (req, res) {
     try {
         let bookId = req.params.bookId
